@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkyField Drone Processor Architecture</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f4f7fb;color:#172033}
+header{background:linear-gradient(135deg,#14213d,#2563eb);color:white;padding:28px 6%;box-shadow:0 3px 12px #0002}
+header h1{margin:0 0 8px;font-size:28px}header p{margin:0;opacity:.9}
+.container{max-width:1200px;margin:24px auto;padding:0 18px}
+nav{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+nav button{border:0;background:white;padding:11px 15px;border-radius:9px;cursor:pointer;font-weight:600;color:#334155;box-shadow:0 1px 5px #0001}
+nav button.active{background:#2563eb;color:white}
+.card{background:white;border-radius:14px;padding:20px;margin-bottom:18px;box-shadow:0 2px 10px #0000000d}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+h2{margin-top:0;color:#1d4ed8}h3{color:#334155}
+input,select{padding:10px;border:1px solid #cbd5e1;border-radius:8px;width:100%;margin:5px 0 12px}
+button.run{background:#16a34a;color:white;border:0;border-radius:8px;padding:10px 16px;font-weight:700;cursor:pointer}
+.result{background:#eef6ff;border-left:4px solid #2563eb;padding:12px;margin-top:12px;border-radius:6px;white-space:pre-wrap}
+table{width:100%;border-collapse:collapse;margin-top:10px}th,td{border:1px solid #dbe2ea;padding:9px;text-align:left}th{background:#eff6ff}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#dbeafe;color:#1d4ed8;font-size:12px;font-weight:700}
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.flow span{background:#e0e7ff;padding:9px 12px;border-radius:8px;font-weight:600}.arrow{color:#64748b}
+.hidden{display:none}.note{color:#64748b;font-size:14px}.success{color:#15803d;font-weight:700}.warn{color:#b45309;font-weight:700}
+footer{text-align:center;color:#64748b;padding:25px}
+</style>
+</head>
+<body>
+<header>
+<h1>SkyField Autonomous Drone Processor</h1>
+<p>Interactive Computer Architecture Design & Simulation Web Application</p>
+</header>
+<div class="container">
+<nav id="nav">
+<button class="active" onclick="showTab('overview',this)">Overview</button>
+<button onclick="showTab('isa',this)">Custom ISA</button>
+<button onclick="showTab('cla',this)">CLA vs RCA</button>
+<button onclick="showTab('division',this)">Non-Restoring Division</button>
+<button onclick="showTab('super',this)">Superscalar</button>
+<button onclick="showTab('vm',this)">Virtual Memory</button>
+<button onclick="showTab('interrupt',this)">Interrupts</button>
+</nav>
+
+<section id="overview" class="tab">
+<div class="card">
+<h2>Problem Statement</h2>
+<p>SkyField Robotics needs a real-time onboard processor for a mid-range autonomous drone used for crop monitoring and disaster surveying. The processor must fuse IMU, GPS and barometric data, execute control-loop calculations, log telemetry and respond rapidly to emergency conditions.</p>
+<div class="flow"><span>Sensor Data</span><b class="arrow">→</b><span>ISA / Datapath</span><b class="arrow">→</b><span>Arithmetic</span><b class="arrow">→</b><span>Control</span><b class="arrow">→</b><span>Telemetry</span></div>
+</div>
+<div class="grid">
+<div class="card"><h3>Architecture Modules</h3><p><span class="badge">10 instructions</span> Custom ISA with immediate, register-indirect and indexed addressing.</p><p><span class="badge">Fast arithmetic</span> Carry-Look-Ahead Adder and Non-Restoring Division.</p></div>
+<div class="card"><h3>Memory & Control</h3><p><span class="badge">2-way issue</span> Simple superscalar/out-of-order dispatch.</p><p><span class="badge">2-level paging</span> TLB hit/miss translation and process isolation.</p><p><span class="badge">Priority ISR</span> Vectored emergency interrupts.</p></div>
+</div>
+</section>
+
+<section id="isa" class="tab hidden">
+<div class="card"><h2>Custom Instruction Set</h2>
+<table><tr><th>Instruction</th><th>Purpose</th><th>Addressing Mode</th></tr>
+<tr><td>LDI</td><td>Load immediate constant</td><td>Immediate</td></tr>
+<tr><td>LD</td><td>Load sensor/memory value</td><td>Register-indirect</td></tr>
+<tr><td>LDS</td><td>Load indexed sensor value</td><td>Indexed</td></tr>
+<tr><td>ST</td><td>Store telemetry/control value</td><td>Register-indirect</td></tr>
+<tr><td>ADD</td><td>Add values</td><td>Register</td></tr>
+<tr><td>SUB</td><td>Subtract values</td><td>Register</td></tr>
+<tr><td>MUL</td><td>Multiply values</td><td>Register</td></tr>
+<tr><td>DIV</td><td>Control-loop ratio</td><td>Register</td></tr>
+<tr><td>JMP</td><td>Change execution flow</td><td>Immediate</td></tr>
+<tr><td>INT</td><td>Generate/handle interrupt</td><td>Immediate</td></tr>
+</table></div>
+</section>
+
+<section id="cla" class="tab hidden">
+<div class="card"><h2>Carry-Look-Ahead Adder</h2>
+<p class="note">Enter two unsigned values. The application calculates the sum and shows a simplified delay comparison for an 8-bit CLA and ripple-carry adder.</p>
+<div class="grid"><div><label>A (0–255)</label><input id="a" type="number" min="0" max="255" value="85"></div><div><label>B (0–255)</label><input id="b" type="number" min="0" max="255" value="51"></div></div>
+<button class="run" onclick="runCLA()">Simulate Addition</button><div id="claOut" class="result">Result will appear here.</div>
+</div>
+</section>
+
+<section id="division" class="tab hidden">
+<div class="card"><h2>Non-Restoring Division</h2>
+<p>Example application: thrust correction = error / gain.</p>
+<div class="grid"><div><label>Dividend / Error</label><input id="dvd" type="number" min="0" value="37"></div><div><label>Divisor / Gain</label><input id="dvs" type="number" min="1" value="5"></div></div>
+<button class="run" onclick="runDivision()">Generate Step Trace</button><div id="divOut" class="result">Trace will appear here.</div>
+</div>
+</section>
+
+<section id="super" class="tab hidden">
+<div class="card"><h2>2-Way Superscalar Dispatch</h2>
+<p>Two independent sensor-fusion instructions can be issued in the same cycle. Dependent instructions must wait.</p>
+<div class="grid"><div><label>Instruction 1</label><select id="i1"><option>ADD R1,R2,R3</option><option>LD R1,[R2]</option><option>MUL R1,R2,R3</option></select></div><div><label>Instruction 2</label><select id="i2"><option>ADD R4,R5,R6</option><option>SUB R4,R1,R6</option><option>LD R4,[R5]</option></select></div></div>
+<button class="run" onclick="runSuper()">Dispatch</button><div id="superOut" class="result">Dispatch result will appear here.</div>
+</div>
+</section>
+
+<section id="vm" class="tab hidden">
+<div class="card"><h2>Two-Level Paged Virtual Memory</h2>
+<p>Use a 16-bit virtual address model with 256-byte pages. The simulator demonstrates TLB hit and miss translation.</p>
+<div class="grid"><div><label>Virtual Address (0–65535)</label><input id="va" type="number" min="0" max="65535" value="4660"></div><div><label>Scenario</label><select id="tlb"><option value="hit">TLB Hit</option><option value="miss">TLB Miss</option></select></div></div>
+<button class="run" onclick="runVM()">Translate Address</button><div id="vmOut" class="result">Translation result will appear here.</div>
+</div>
+</section>
+
+<section id="interrupt" class="tab hidden">
+<div class="card"><h2>Vectored Interrupt Controller</h2>
+<div class="grid"><div><label>Emergency event</label><select id="irq"><option value="battery">Low Battery</option><option value="sensor">Sensor Fault</option><option value="collision">Collision Warning</option></select></div></div>
+<button class="run" onclick="runIRQ()">Handle Interrupt</button><div id="irqOut" class="result">Interrupt response will appear here.</div>
+</div>
+</section>
+
+<footer>SkyField Robotics • CSA1209 Computer Architecture • Educational simulation</footer>
+</div>
+<script>
+function showTab(id,btn){document.querySelectorAll('.tab').forEach(x=>x.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));btn.classList.add('active')}
+
+function runCLA(){
+ let a=+document.getElementById('a').value,b=+document.getElementById('b').value;
+ if(a<0||a>255||b<0||b>255){document.getElementById('claOut').textContent='Enter values from 0 to 255.';return}
+ let sum=a+b;
+ let p=(a^b), g=(a&b);
+ document.getElementById('claOut').textContent=`A = ${a} (${a.toString(2).padStart(8,'0')})
+B = ${b} (${b.toString(2).padStart(8,'0')})
+Sum = ${sum} (${(sum&255).toString(2).padStart(8,'0')})${sum>255?' with carry-out 1':''}
+
+CLA concept:
+Pi = Ai XOR Bi
+Gi = Ai AND Bi
+Carries are generated using propagate/generate logic.
+
+Simplified comparison:
+8-bit RCA critical path ≈ 8 carry stages
+8-bit CLA critical path ≈ carry-look-ahead logic with fewer serial carry stages
+Conclusion: CLA is faster, while RCA is simpler.`;
+}
+
+function runDivision(){
+ let n=Math.abs(parseInt(document.getElementById('dvd').value)),d=Math.abs(parseInt(document.getElementById('dvs').value));
+ if(!Number.isInteger(n)||!Number.isInteger(d)||d===0){document.getElementById('divOut').textContent='Enter a valid positive divisor.';return}
+ let q=Math.floor(n/d),r=n%d,bits=Math.max(1,Math.ceil(Math.log2(n+1)));
+ let lines=[`Dividend = ${n}, Divisor = ${d}`,`Expected quotient = ${q}, remainder = ${r}`,'','Simplified non-restoring trace:'];
+ let rem=0;
+ for(let i=bits-1;i>=0;i--){
+   rem=(rem<<1)|((n>>i)&1);
+   let action;
+   if(rem>=d){rem-=d;action=`subtract divisor → R=${rem}, Q bit=1`;}
+   else{action=`restore/no subtract → R=${rem}, Q bit=0`;}
+   lines.push(`Step ${bits-i}: shift → ${action}`);
+ }
+ lines.push('',`Final: Q = ${q}, R = ${r}`);
+ document.getElementById('divOut').textContent=lines.join('\\n');
+}
+
+function runSuper(){
+ let x=document.getElementById('i1').value,y=document.getElementById('i2').value;
+ let dependent=(y.includes('R1'));
+ document.getElementById('superOut').textContent=dependent
+ ? `${x}\\n${y}\\n\\nDependency detected: instruction 2 uses R1 produced by instruction 1.\\nDispatch: in-order dependency forces instruction 2 to wait.\\nResult: no parallel issue for this pair.`
+ : `${x}\\n${y}\\n\\nNo data dependency detected.\\nDispatch: both instructions can issue in the same cycle on a 2-way superscalar datapath.\\nResult: improved instruction-level parallelism.`;
+}
+
+function runVM(){
+ let va=+document.getElementById('va').value,mode=document.getElementById('tlb').value;
+ let page=Math.floor(va/256),offset=va%256,p1=Math.floor(page/16),p2=page%16;
+ let frame=(page*3+7)%256,pa=frame*256+offset;
+ let text=`Virtual address = ${va}\\nPage number = ${page}\\nOffset = ${offset}\\nLevel-1 index = ${p1}\\nLevel-2 index = ${p2}\\n\\n`;
+ if(mode==='hit') text+=`TLB HIT\\nTLB directly supplies frame = ${frame}\\nPhysical address = ${pa}\\nTranslation avoids a page-table walk.`;
+ else text+=`TLB MISS\\n1. Check TLB → entry not found\\n2. Read Level-1 page table\\n3. Read Level-2 page table\\n4. Obtain frame = ${frame}\\n5. Update TLB\\nPhysical address = ${pa}`;
+ document.getElementById('vmOut').textContent=text;
+}
+
+function runIRQ(){
+ let e=document.getElementById('irq').value;
+ let data={battery:['Low Battery','Priority 1 (highest)','0x10'],sensor:['Sensor Fault','Priority 2','0x14'],collision:['Collision Warning','Priority 1 (highest)','0x18']}[e];
+ document.getElementById('irqOut').textContent=`Event: ${data[0]}
+Priority: ${data[1]}
+Vector address: ${data[2]}
+
+Response sequence:
+1. Detect interrupt.
+2. Save processor context.
+3. Look up vector-table entry.
+4. Jump to emergency ISR.
+5. Execute safety response.
+6. Restore context.
+7. Return to interrupted program.
+
+Interrupts are preferred to polling because the processor can respond immediately without continuously checking every sensor.`;
+}
+</script>
+</body>
+</html>
